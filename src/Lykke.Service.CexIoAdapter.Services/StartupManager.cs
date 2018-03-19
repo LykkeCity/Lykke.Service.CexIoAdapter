@@ -14,15 +14,18 @@ namespace Lykke.Service.CexIoAdapter.Services
     public class StartupManager : IStartupManager
     {
         private readonly ILog _log;
+        private readonly OrderbookPublishingService _orderbookPublishingService;
 
-        public StartupManager(ILog log)
+        public StartupManager(ILog log, OrderbookPublishingService orderbookPublishingService)
         {
             _log = log;
+            _orderbookPublishingService = orderbookPublishingService;
         }
 
         public async Task StartAsync()
         {
             // TODO: Implement your startup logic here. Good idea is to log every step
+            _orderbookPublishingService.Start();
 
             await Task.CompletedTask;
         }

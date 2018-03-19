@@ -8,6 +8,7 @@ using Lykke.Common.ApiLibrary.Middleware;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Logs;
 using Lykke.Service.CexIoAdapter.Core.Services;
+using Lykke.Service.CexIoAdapter.Middleware;
 using Lykke.Service.CexIoAdapter.Settings;
 using Lykke.Service.CexIoAdapter.Modules;
 using Lykke.SettingsReader;
@@ -50,10 +51,13 @@ namespace Lykke.Service.CexIoAdapter
                 services.AddSwaggerGen(options =>
                 {
                     options.DefaultLykkeConfiguration("v1", "CexIoAdapter API");
+                    options.OperationFilter<AddLykkeAuthorizationHeaderFilter>();
                 });
 
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
+
+                XApiKeyAuthAttribute.Credentials = appSettings.CurrentValue.CexIoAdapterService.Clients;
 
                 Log = CreateLogWithSlack(services, appSettings);
 
@@ -74,6 +78,8 @@ namespace Lykke.Service.CexIoAdapter
         {
             try
             {
+                var settings = Configuration.LoadSettings<AppSettings>();
+
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
@@ -81,6 +87,8 @@ namespace Lykke.Service.CexIoAdapter
 
                 app.UseLykkeForwardedHeaders();
                 app.UseLykkeMiddleware("CexIoAdapter", ex => new { Message = "Technical problem" });
+
+                app.UseAuthenticationMiddleware(settings.Nested(x => x.CexIoAdapterService) , Log);
 
                 app.UseMvc();
                 app.UseSwagger(c =>

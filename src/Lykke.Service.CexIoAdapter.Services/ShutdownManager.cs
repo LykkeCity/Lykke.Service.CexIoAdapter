@@ -14,22 +14,18 @@ namespace Lykke.Service.CexIoAdapter.Services
     public class ShutdownManager : IShutdownManager
     {
         private readonly ILog _log;
-        private readonly List<IStopable> _items = new List<IStopable>();
+        private readonly IEnumerable<IStopable> _stopables;
 
-        public ShutdownManager(ILog log)
+        public ShutdownManager(ILog log, IEnumerable<IStopable> stopables)
         {
             _log = log;
-        }
-
-        public void Register(IStopable stopable)
-        {
-            _items.Add(stopable);
+            _stopables = stopables ;
         }
 
         public async Task StopAsync()
         {
             // TODO: Implement your shutdown logic here. Good idea is to log every step
-            foreach (var item in _items)
+            foreach (var item in _stopables)
             {
                 item.Stop();
             }

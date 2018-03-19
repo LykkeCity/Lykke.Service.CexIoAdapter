@@ -1,6 +1,8 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
+using Common;
 using Common.Log;
+using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
 using Lykke.Service.CexIoAdapter.Core.Services;
 using Lykke.Service.CexIoAdapter.Settings.ServiceSettings;
 using Lykke.Service.CexIoAdapter.Services;
@@ -47,6 +49,16 @@ namespace Lykke.Service.CexIoAdapter.Modules
                 .As<IShutdownManager>();
 
             // TODO: Add your dependencies here
+
+            builder.RegisterType<OrderbookPublishingService>()
+                .AsSelf()
+                .As<IStopable>()
+                .WithParameter(new TypedParameter(typeof(OrderBookSettings), _settings.CurrentValue.OrderBooks))
+                .WithParameter(new TypedParameter(typeof(RabbitMq), _settings.CurrentValue.RabbitMq))
+                .SingleInstance();
+
+            builder.RegisterInstance(_settings.CurrentValue.OrderBooks.CurrencyMapping)
+                .AsSelf();
 
             builder.Populate(_services);
         }

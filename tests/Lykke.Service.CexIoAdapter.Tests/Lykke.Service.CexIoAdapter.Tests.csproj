@@ -1,20 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <Version>1.0.0</Version>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="Moq" Version="4.8.1" />
     <PackageReference Include="xunit" Version="2.3.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Lykke.Service.CexIoAdapter.Core\Lykke.Service.CexIoAdapter.Core.csproj">
+      <Project>{F5B2F6B8-A8CC-4612-8F1D-C063EB8C8955}</Project>
+      <Name>Lykke.Service.CexIoAdapter.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\Lykke.Service.CexIoAdapter.Services\Lykke.Service.CexIoAdapter.Services.csproj">
+      <Project>{2D5F52EC-2A27-4045-81ED-72355E2A6325}</Project>
+      <Name>Lykke.Service.CexIoAdapter.Services</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

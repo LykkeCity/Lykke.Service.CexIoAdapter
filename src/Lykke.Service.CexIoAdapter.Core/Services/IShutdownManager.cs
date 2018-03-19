@@ -6,7 +6,5 @@ namespace Lykke.Service.CexIoAdapter.Core.Services
     public interface IShutdownManager
     {
         Task StopAsync();
-
-        void Register(IStopable stopable);
     }
 }
