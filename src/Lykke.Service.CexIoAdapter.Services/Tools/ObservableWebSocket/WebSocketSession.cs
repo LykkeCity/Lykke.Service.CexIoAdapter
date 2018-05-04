@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Log;
+using Lykke.Service.CexIoAdapter.Services.CexIo.Models.WebSocketApi;
 using Newtonsoft.Json;
 
 namespace Lykke.Service.CexIoAdapter.Services.Tools.ObservableWebSocket
@@ -21,6 +23,8 @@ namespace Lykke.Service.CexIoAdapter.Services.Tools.ObservableWebSocket
             _log = log;
         }
 
+        private readonly HashSet<Type> _dontLogCommands = new HashSet<Type> { typeof(PongCommand) };
+
         public async Task SendAsJson<T>(T cmd)
         {
             try
@@ -28,7 +32,10 @@ namespace Lykke.Service.CexIoAdapter.Services.Tools.ObservableWebSocket
                 await _writeLock.WaitAsync();
                 var str = JsonConvert.SerializeObject(cmd);
 
-                await _log.WriteInfoAsync(nameof(WebSocketSession), "", $"Sending: {str}");
+                if (!_dontLogCommands.Contains(typeof(T)))
+                {
+                    await _log.WriteInfoAsync(nameof(WebSocketSession), "", $"Sending: {str}");
+                }
 
                 using (var cts = new CancellationTokenSource(_sendTimeout))
                 {
