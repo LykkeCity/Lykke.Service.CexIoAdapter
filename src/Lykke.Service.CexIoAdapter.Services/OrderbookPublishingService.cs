@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Autofac;
 using Common;
 using Common.Log;
+using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.RabbitMqBroker.Publisher;
 using Lykke.RabbitMqBroker.Subscriber;
 using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;

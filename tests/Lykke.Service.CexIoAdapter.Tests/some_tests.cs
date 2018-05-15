@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
 using Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
@@ -22,7 +23,7 @@ namespace Lykke.Service.CexIoAdapter.Tests
         {
             var time = DateTime.UtcNow;
 
-            var orderBook = new OrderBook(null, "Exchange", "BTC:USD", time,
+            var orderBook = new OrderBook("Exchange", "BTC:USD", time,
                 bids: new[] {new OrderBookItem(12000, 0.0005M),},
                 asks: new[] {new OrderBookItem(11000, 0.0004M)});
 

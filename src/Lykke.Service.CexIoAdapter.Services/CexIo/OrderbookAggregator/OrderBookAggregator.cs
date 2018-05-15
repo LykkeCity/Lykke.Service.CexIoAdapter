@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Linq;
 using Common.Log;
+using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.WebSocketApi;
 using Lykke.SettingsReader;
@@ -68,7 +69,6 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator
                     $"and {subscription.Bids.Count} bids");
 
                 OrderBook = new OrderBook(
-                    _log,
                     _exchangeName,
                     _instrument,
                     DateTime.UtcNow,
