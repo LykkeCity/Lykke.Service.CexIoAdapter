@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -57,7 +58,8 @@ namespace Lykke.Service.CexIoAdapter
                 var builder = new ContainerBuilder();
                 var appSettings = Configuration.LoadSettings<AppSettings>();
 
-                XApiKeyAuthAttribute.Credentials = appSettings.CurrentValue.CexIoAdapterService.Clients;
+                XApiKeyAuthAttribute.Credentials = appSettings.CurrentValue.CexIoAdapterService.Clients
+                    .ToDictionary(x => x.InternalApiKey);
 
                 Log = CreateLogWithSlack(services, appSettings);
 

@@ -9,7 +9,7 @@ namespace Lykke.Service.CexIoAdapter.Settings.ServiceSettings
 
         public OrderBookSettings OrderBooks { get; set; }
 
-        public IReadOnlyDictionary<string, ApiCredentials> Clients { get; set; }
+        public IReadOnlyCollection<ApiCredentials> Clients { get; set; }
 
         public RabbitMq RabbitMq { get; set; }
     }

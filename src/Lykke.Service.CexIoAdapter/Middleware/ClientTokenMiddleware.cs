@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Common.Log;
 using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
@@ -38,14 +39,13 @@ namespace Lykke.Service.CexIoAdapter.Middleware
 
                 if (context.Request.Headers.TryGetValue(ClientTokenHeader, out var token))
                 {
-                    if (settings.CurrentValue.Clients.TryGetValue(
-                        token.FirstOrDefault(),
-                        out var creds))
+                    var creds = settings.CurrentValue.Clients.FirstOrDefault(x =>
+                        x.InternalApiKey.Equals(token.First(), StringComparison.InvariantCultureIgnoreCase));
 
-                        if (creds != null)
-                        {
-                            context.Items[RestClientKey] = new CexIoRestClient(creds, mapping);
-                        }
+                    if (creds != null)
+                    {
+                        context.Items[RestClientKey] = new CexIoRestClient(creds, mapping);
+                    }
                 }
                 else
                 {
