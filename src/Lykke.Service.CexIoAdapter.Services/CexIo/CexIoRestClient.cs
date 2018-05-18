@@ -14,7 +14,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 {
     public class CexIoRestClient
     {
-        private readonly ApiCredentials _credentials;
+        private readonly IApiCredentials _credentials;
         private readonly CurrencyMapping _currencyMapping;
 
         private static readonly HttpClient Client = new HttpClient
@@ -24,7 +24,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 
         private const string Limit = "limit";
 
-        public CexIoRestClient(ApiCredentials credentials, CurrencyMapping currencyMapping)
+        public CexIoRestClient(IApiCredentials credentials, CurrencyMapping currencyMapping)
         {
             _credentials = credentials;
             _currencyMapping = currencyMapping;

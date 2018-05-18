@@ -8,7 +8,7 @@ namespace Lykke.Service.CexIoAdapter.Middleware
 {
     public sealed class XApiKeyAuthAttribute : ActionFilterAttribute
     {
-        internal static IReadOnlyDictionary<string, ApiCredentials> Credentials { get; set; }
+        internal static IReadOnlyDictionary<string, InternalApiCredentials> Credentials { get; set; }
 
         public override void OnActionExecuting(ActionExecutingContext context)
         {

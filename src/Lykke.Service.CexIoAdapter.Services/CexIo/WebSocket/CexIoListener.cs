@@ -19,7 +19,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
 
         public CexIoListener(
             IReadOnlyCollection<(string, string)> pairs,
-            ApiCredentials credentials,
+            IApiCredentials credentials,
             WebSocketTimeouts timeouts,
             ILog log)
         {
@@ -91,7 +91,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
             return ev;
         }
 
-        private async Task<ISocketEvent> AuthenticateWhenConnected(ISocketEvent ev, ApiCredentials creds)
+        private async Task<ISocketEvent> AuthenticateWhenConnected(ISocketEvent ev, IApiCredentials creds)
         {
             if (ev is IMessageReceived<CexIoResponse> mr)
             {

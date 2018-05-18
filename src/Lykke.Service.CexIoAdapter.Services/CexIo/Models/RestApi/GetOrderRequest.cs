@@ -8,7 +8,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
         [JsonProperty("id")]
         public string Id { get; set; }
 
-        public GetOrderRequest(string id, ApiCredentials credentials, long nonce)
+        public GetOrderRequest(string id, IApiCredentials credentials, long nonce)
             : base(credentials, nonce)
         {
             Id = id;

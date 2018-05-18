@@ -40,7 +40,7 @@ namespace Lykke.Service.CexIoAdapter.Tests
         [Fact]
         public async Task get_currency_limits()
         {
-            var rest = new CexIoRestClient(new ApiCredentials(), _mapping);
+            var rest = new CexIoRestClient(new InternalApiCredentials(), _mapping);
             var limits = await rest.GetCurrencyLimits();
             Assert.NotEmpty(limits);
         }
@@ -52,7 +52,7 @@ namespace Lykke.Service.CexIoAdapter.Tests
             FourCharsCurrencies = new[] {"DASH"}
         };
 
-        private readonly ApiCredentials _creds = new ApiCredentials
+        private readonly InternalApiCredentials _creds = new InternalApiCredentials
         {
             ApiSecret = "secret",
             ApiKey = "key",

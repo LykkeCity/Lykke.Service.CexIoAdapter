@@ -12,7 +12,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
         {
         }
 
-        public EmptyRequest(ApiCredentials credentials, long nonce)
+        public EmptyRequest(IApiCredentials credentials, long nonce)
         {
             Key = credentials.ApiKey;
             Nonce = nonce.ToString();

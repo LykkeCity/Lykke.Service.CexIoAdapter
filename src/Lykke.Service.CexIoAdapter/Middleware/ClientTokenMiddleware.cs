@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using Common.Log;
 using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
@@ -33,23 +35,25 @@ namespace Lykke.Service.CexIoAdapter.Middleware
             IReloadingManager<CexIoAdapterSettings> settings,
             ILog log)
         {
+            var allClients = settings.CurrentValue.Clients.ToDictionary(x => x.InternalApiKey);
+
             app.Use((context, next) =>
             {
                 var mapping = settings.CurrentValue.OrderBooks.CurrencyMapping;
 
                 if (context.Request.Headers.TryGetValue(ClientTokenHeader, out var token))
                 {
-                    var creds = settings.CurrentValue.Clients.FirstOrDefault(x =>
-                        x.InternalApiKey.Equals(token.First(), StringComparison.InvariantCultureIgnoreCase));
-
-                    if (creds != null)
+                    if (allClients.TryGetValue(token[0], out var creds))
                     {
-                        context.Items[RestClientKey] = new CexIoRestClient(creds, mapping);
+                        if (creds != null)
+                        {
+                            context.Items[RestClientKey] = new CexIoRestClient(creds, mapping);
+                        }
                     }
                 }
                 else
                 {
-                    context.Items[RestClientKey] = new CexIoRestClient(new ApiCredentials(), mapping);
+                    context.Items[RestClientKey] = new CexIoRestClient(new InternalApiCredentials(), mapping);
                 }
 
                 return next();

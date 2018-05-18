@@ -4,25 +4,9 @@ using Newtonsoft.Json.Converters;
 
 namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
 {
-    public struct PlaceOrderCommand
-    {
-        public readonly OrderType OrderType;
-        public readonly decimal Amount;
-        public readonly decimal Price;
-        public readonly string Instrument;
-
-        public PlaceOrderCommand(string instrument, decimal price, decimal amount, OrderType orderType)
-        {
-            Instrument = instrument;
-            Price = price;
-            Amount = amount;
-            OrderType = orderType;
-        }
-    }
-
     public sealed class PlaceOrderRequest : EmptyRequest
     {
-        public PlaceOrderRequest(ApiCredentials creds, long nonce) : base(creds, nonce)
+        public PlaceOrderRequest(IApiCredentials creds, long nonce) : base(creds, nonce)
         {
         }
 
