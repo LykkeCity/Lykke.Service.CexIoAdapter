@@ -78,7 +78,7 @@ namespace Lykke.Service.CexIoAdapter.Services
                     .Where(x => x != null)
                     .GroupBy(x => x.Pair)
                     .SelectMany(ProcessSingleInstrument)
-                    .Do(_ => { }, err => _log.WriteError("listen-orderbooks", "", err))
+                    .Do(_ => { }, err => _log.WriteInfo("listen-orderbooks", "", err.Message))
                     .RetryWithBackoff(TimeSpan.FromMilliseconds(50), TimeSpan.FromMinutes(1))
                     .Repeat()
                     .Share();
@@ -202,11 +202,6 @@ namespace Lykke.Service.CexIoAdapter.Services
                     .Start();
 
             return connection;
-        }
-
-        private void Error(Exception error)
-        {
-            _log.WriteError(nameof(OrderbookPublishingService), nameof(OrderbookPublishingService), error);
         }
 
         private static async Task<T> PublishMessageToRabbitMq<T>(

@@ -48,16 +48,6 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator
             };
         }
 
-        private void Warn(string message)
-        {
-            _log.WriteWarning(nameof(OrderBookAggregator), nameof(OrderBookAggregator), message);
-        }
-
-        private void Trace(string message)
-        {
-            _log.WriteInfo(nameof(OrderBookAggregator), nameof(OrderBookAggregator), message);
-        }
-
         public OrderBookAggregator ApplyChange(IOrderBookMessage ev)
         {
             if (ev is OrderBookSubscription subscription && OrderBook == null)
