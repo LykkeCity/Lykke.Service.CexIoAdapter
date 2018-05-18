@@ -25,7 +25,8 @@ namespace Lykke.Service.CexIoAdapter.Middleware
                 return (CexIoRestClient) client;
             }
 
-            return null;
+            throw new InvalidOperationException($"Request should be authenticated to use cex-io RestAPI " +
+                                                $"(pass {ClientTokenHeader} header with the request)");
         }
 
         public const string ClientTokenHeader = "X-API-KEY";
@@ -50,10 +51,6 @@ namespace Lykke.Service.CexIoAdapter.Middleware
                             context.Items[RestClientKey] = new CexIoRestClient(creds, mapping);
                         }
                     }
-                }
-                else
-                {
-                    context.Items[RestClientKey] = new CexIoRestClient(new InternalApiCredentials(), mapping);
                 }
 
                 return next();
