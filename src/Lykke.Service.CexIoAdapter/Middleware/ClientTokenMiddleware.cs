@@ -1,12 +1,7 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using Common.Log;
-using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
-using Lykke.Service.CexIoAdapter.Services.CexIo.Models;
-using Lykke.Service.CexIoAdapter.Settings;
 using Lykke.Service.CexIoAdapter.Settings.ServiceSettings;
 using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;

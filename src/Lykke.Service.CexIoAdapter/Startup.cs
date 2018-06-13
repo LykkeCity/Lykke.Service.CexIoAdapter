@@ -23,6 +23,7 @@ namespace Lykke.Service.CexIoAdapter
 {
     public class Startup
     {
+        private IReloadingManagerWithConfiguration<AppSettings> _settings;
         public IHostingEnvironment Environment { get; }
         public IContainer ApplicationContainer { get; private set; }
         public IConfigurationRoot Configuration { get; }
@@ -42,6 +43,8 @@ namespace Lykke.Service.CexIoAdapter
         {
             try
             {
+                _settings = Configuration.LoadSettings<AppSettings>();
+
                 services.AddMvc()
                     .AddJsonOptions(options =>
                     {
@@ -56,14 +59,13 @@ namespace Lykke.Service.CexIoAdapter
                 });
 
                 var builder = new ContainerBuilder();
-                var appSettings = Configuration.LoadSettings<AppSettings>();
 
-                XApiKeyAuthAttribute.Credentials = appSettings.CurrentValue.CexIoAdapterService.Clients
+                XApiKeyAuthAttribute.Credentials = _settings.CurrentValue.CexIoAdapterService.Clients
                     .ToDictionary(x => x.InternalApiKey);
 
-                Log = CreateLogWithSlack(services, appSettings);
+                Log = CreateLogWithSlack(services, _settings);
 
-                builder.RegisterModule(new ServiceModule(appSettings.Nested(x => x.CexIoAdapterService), Log));
+                builder.RegisterModule(new ServiceModule(_settings.Nested(x => x.CexIoAdapterService), Log));
                 builder.Populate(services);
                 ApplicationContainer = builder.Build();
 
@@ -80,8 +82,6 @@ namespace Lykke.Service.CexIoAdapter
         {
             try
             {
-                var settings = Configuration.LoadSettings<AppSettings>();
-
                 if (env.IsDevelopment())
                 {
                     app.UseDeveloperExceptionPage();
@@ -90,7 +90,7 @@ namespace Lykke.Service.CexIoAdapter
                 app.UseLykkeForwardedHeaders();
                 app.UseLykkeMiddleware("CexIoAdapter", ex => new { Message = "Technical problem" });
 
-                app.UseAuthenticationMiddleware(settings.Nested(x => x.CexIoAdapterService) , Log);
+                app.UseAuthenticationMiddleware(_settings.Nested(x => x.CexIoAdapterService) , Log);
 
                 app.UseMvc();
                 app.UseSwagger(c =>

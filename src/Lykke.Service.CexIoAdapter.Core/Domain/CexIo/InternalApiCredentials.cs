@@ -1,6 +1,4 @@
-﻿using Lykke.SettingsReader.Attributes;
-
-namespace Lykke.Service.CexIoAdapter.Core.Domain.CexIo
+﻿namespace Lykke.Service.CexIoAdapter.Core.Domain.CexIo
 {
     public class InternalApiCredentials : IApiCredentials
     {

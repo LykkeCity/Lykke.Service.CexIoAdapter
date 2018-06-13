@@ -104,7 +104,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 
         private Task<T> WithNonce<T>(Func<long, Task<T>> code)
         {
-            return Nonce.With(_credentials.UserId, code);
+            return EpochNonce.Lock(_credentials.UserId, code);
         }
 
         public Task<IReadOnlyCollection<Order>> GetOpenOrdersByInstrument(

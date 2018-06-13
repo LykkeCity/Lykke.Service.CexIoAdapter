@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reactive.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Lykke.Common.ExchangeAdapter.Contracts;
 using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
-using Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
-using Lykke.Service.CexIoAdapter.Services.CexIo.Models;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi;
-using Lykke.Service.CexIoAdapter.Services.Tools;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;

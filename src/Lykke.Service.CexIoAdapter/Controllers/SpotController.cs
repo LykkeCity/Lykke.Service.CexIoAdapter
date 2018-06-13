@@ -5,7 +5,6 @@ using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
 using Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts;
 using Lykke.Service.CexIoAdapter.Middleware;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
-using Lykke.Service.CexIoAdapter.Services.CexIo.Models;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
