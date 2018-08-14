@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Log;
@@ -17,6 +18,7 @@ using Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator;
 using Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Microsoft.Extensions.Hosting;
+using Nexogen.Libraries.Metrics;
 
 namespace Lykke.Service.CexIoAdapter.Services
 {
@@ -34,10 +36,23 @@ namespace Lykke.Service.CexIoAdapter.Services
             _logFactory = lf;
             _orderBookSettings = settings.OrderBooks;
 
+            var rawOrderBooks = CalculateOrderBooks(GetRawOrderBooks());
+
             Session = OrderBooksSession.FromRawOrderBooks(
-                GetRawOrderBooks(),
+                rawOrderBooks,
                 settings.ToCommonSettings(),
                 lf);
+        }
+
+        private IObservable<OrderBook> CalculateOrderBooks(IObservable<OrderBook> rawOrderBooks)
+        {
+            var counter = Metrics.Prometheus.Counter()
+                .Name("orderbook_received_count_total")
+                .Help("Total counts of order books received from web-socket")
+                .LabelNames("source", "asset")
+                .Register();
+
+            return rawOrderBooks.Do(ob => counter.Labels(ob.Source, ob.Asset).Increment());
         }
 
         private IObservable<OrderBook> GetRawOrderBooks()

@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="4.1.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+    <PackageReference Include="Nexogen.Libraries.Metrics.Prometheus.AspCore" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lykke.Service.CexIoAdapter.Core\Lykke.Service.CexIoAdapter.Core.csproj" />

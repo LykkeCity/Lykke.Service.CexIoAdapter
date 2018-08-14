@@ -23,6 +23,11 @@ namespace Lykke.Service.CexIoAdapter.Modules
                 .As<IHostedService>()
                 .SingleInstance();
 
+            builder.RegisterType<MetricsServer>()
+                .AsSelf()
+                .As<IHostedService>()
+                .SingleInstance();
+
             builder.RegisterInstance(_settings.CurrentValue.CexIoAdapterService)
                 .AsSelf();
         }
