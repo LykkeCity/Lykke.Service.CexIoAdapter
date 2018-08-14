@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Common.Log;
-using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
+using Lykke.Common.ExchangeAdapter.Tools.ObservableWebSocket;
+using Lykke.Common.Log;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.WebSocketApi;
+using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Services.Tools;
-using Lykke.Service.CexIoAdapter.Services.Tools.ObservableWebSocket;
 using Newtonsoft.Json;
 
 namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
@@ -28,7 +29,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
 
             var parser = new CexIoParser(log);
 
-            Messages = new ObservableWebSocket(WebSocketApiUrl, log, timeouts)
+            Messages = new ObservableWebSocket(WebSocketApiUrl, x => log.Info(x), timeouts)
                 .Select(x => x.Convert<byte[], CexIoResponse>(parser.Parse))
                 .Where(x => x != null)
                 .Do(LogServiceMessages)
@@ -49,7 +50,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
                     return;
                 }
 
-                Info($"Message received: {JsonConvert.SerializeObject(obj)}");
+                _log.Info($"Message received: {JsonConvert.SerializeObject(obj)}");
             }
         }
 
@@ -79,7 +80,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
                         throw new Exception($"Authentication failed: {authenticated.Error}");
                     }
 
-                    Info("Sending subscribe commands");
+                    _log.Info("Sending subscribe commands");
 
                     foreach (var l in pairs)
                     {
@@ -105,11 +106,6 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket
             }
 
             return ev;
-        }
-
-        private void Info(string message)
-        {
-            _log.WriteInfo(nameof(CexIoListener), "", message);
         }
     }
 }

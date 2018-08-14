@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Lykke.Service.CexIoAdapter.Core.Domain.CexIo
+namespace Lykke.Service.CexIoAdapter.Services.Settings
 {
     public sealed class CurrencyMapping
     {

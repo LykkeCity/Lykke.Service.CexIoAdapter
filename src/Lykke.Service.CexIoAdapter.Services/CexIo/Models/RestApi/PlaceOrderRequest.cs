@@ -1,4 +1,4 @@
-﻿using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
+﻿using Lykke.Service.CexIoAdapter.Services.Settings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 

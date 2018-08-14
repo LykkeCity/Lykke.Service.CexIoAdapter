@@ -1,4 +1,4 @@
-﻿namespace Lykke.Service.CexIoAdapter.Core.Domain.CexIo
+﻿namespace Lykke.Service.CexIoAdapter.Services.Settings
 {
     public sealed class RabbitMq
     {

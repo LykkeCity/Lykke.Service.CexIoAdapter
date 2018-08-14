@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts
+namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
 {
     public class Wallet
     {
