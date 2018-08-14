@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="4.1.1" />
+    <PackageReference Include="Nexogen.Libraries.Metrics.Prometheus.AspCore" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />

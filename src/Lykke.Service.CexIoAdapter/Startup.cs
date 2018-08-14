@@ -4,11 +4,13 @@ using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.Log;
 using Lykke.Sdk;
+using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Nexogen.Libraries.Metrics.Prometheus.AspCore;
 
 namespace Lykke.Service.CexIoAdapter
 {
@@ -23,6 +25,9 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
+            services.AddPrometheus(Metrics.Prometheus);
+            services.AddSingleton(new HttpMetrics(Metrics.Prometheus));
+
             return services.BuildServiceProvider<AppSettings>(options =>
             {
                 options.Logs = logs =>
@@ -41,10 +46,15 @@ namespace Lykke.Service.CexIoAdapter
         public void Configure(IApplicationBuilder app)
         {
             var settings = app.ApplicationServices.GetService<CexIoAdapterSettings>();
-            var logFactory = app.ApplicationServices.GetService<ILogFactory>();
+            // var logFactory = app.ApplicationServices.GetService<ILogFactory>();
 
             XApiKeyAuthAttribute.Credentials =
                 settings.Clients.ToDictionary(x => x.InternalApiKey, x => (object) x);
+
+//            app.UsePrometheus(options =>
+//            {
+//                options.CollectHttpMetrics();
+//            });
 
             app.UseLykkeConfiguration(options =>
             {
@@ -56,6 +66,7 @@ namespace Lykke.Service.CexIoAdapter
                         GetCredentials(settings, token),
                         settings.OrderBooks.CurrencyMapping));
                     x.UseHandleBusinessExceptionsMiddleware();
+                    x.UseMiddleware<CollectMetricsMiddleware>();
                 };
             });
         }

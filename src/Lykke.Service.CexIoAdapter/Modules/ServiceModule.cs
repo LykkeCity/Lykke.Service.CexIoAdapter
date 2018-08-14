@@ -4,6 +4,7 @@ using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.Hosting;
+using Nexogen.Libraries.Metrics.Prometheus;
 
 namespace Lykke.Service.CexIoAdapter.Modules
 {
@@ -30,6 +31,8 @@ namespace Lykke.Service.CexIoAdapter.Modules
 
             builder.RegisterInstance(_settings.CurrentValue.CexIoAdapterService)
                 .AsSelf();
+
+            builder.RegisterInstance(Metrics.Prometheus).As<IExposable>();
         }
     }
 }
