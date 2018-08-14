@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,6 +34,14 @@ namespace Lykke.Service.CexIoAdapter.Services
             _logFactory = lf;
             _orderBookSettings = settings.OrderBooks;
 
+            Session = OrderBooksSession.FromRawOrderBooks(
+                GetRawOrderBooks(),
+                settings.ToCommonSettings(),
+                lf);
+        }
+
+        private IObservable<OrderBook> GetRawOrderBooks()
+        {
             var creds = new ApiCredentials
             {
                 ApiKey = _orderBookSettings.WebSocketCredentials.ApiKey,
@@ -58,16 +67,12 @@ namespace Lykke.Service.CexIoAdapter.Services
                 .Where(x => x != null)
                 .GroupBy(x => x.Pair)
                 .SelectMany(ProcessSingleInstrument);
-
-            Session = OrderBooksSession.FromRawOrderBooks(orderbooks, settings.ToCommonSettings(), lf);
-
-            _worker = Session.Worker;
+            return orderbooks;
         }
 
         public OrderBooksSession Session { get; }
 
         private IDisposable _subscription;
-        private readonly IObservable<Unit> _worker;
         private readonly ILogFactory _logFactory;
 
         private async Task<IReadOnlyCollection<(string, string)>> GetPairs(CexIoRestClient restApi)
@@ -106,7 +111,8 @@ namespace Lykke.Service.CexIoAdapter.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _subscription = _worker.Subscribe();
+            _subscription = new CompositeDisposable(Session.Worker.Subscribe(), Session);
+
             return Task.CompletedTask;
         }
 
