@@ -4,9 +4,10 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
-using Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts;
+using Lykke.Common.ExchangeAdapter;
+using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi;
+using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Services.Tools;
 using Newtonsoft.Json.Linq;
 
@@ -42,9 +43,9 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             }
         }
 
-        public Task<WalletsResponse> GetBalance(CancellationToken ct = default(CancellationToken))
+        public Task<GetWalletsResponse> GetBalance(CancellationToken ct = default(CancellationToken))
         {
-            return WithNonce(async nonce =>
+            return EpochNonce.Lock(_credentials.ApiKey, async nonce =>
             {
                 var cmd = EmptyRequest(nonce);
 
@@ -54,7 +55,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 
                     EnsureNoErrorProperty(obj);
 
-                    return new WalletsResponse
+                    return new GetWalletsResponse
                     {
                         Wallets = ParseAmounts(obj).ToArray()
                     };
@@ -70,7 +71,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             }
         }
 
-        private static IEnumerable<Wallet> ParseAmounts(JObject response)
+        private static IEnumerable<WalletBalanceModel> ParseAmounts(JObject response)
         {
             var exclude = new[] {"timestamp", "username"};
 
@@ -80,7 +81,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 
                 var balance = kv.Value.ToObject<Balance>();
 
-                yield return new Wallet
+                yield return new WalletBalanceModel
                 {
                     Asset = kv.Key,
                     Balance = balance.Available,
@@ -102,33 +103,28 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             return response.Data.Pairs;
         }
 
-        private Task<T> WithNonce<T>(Func<long, Task<T>> code)
+//        public async Task<IReadOnlyCollection<Order>> GetOpenOrdersByInstrument(
+//            string instrument,
+//            CancellationToken ct = default(CancellationToken))
+//        {
+//            return await EpochNonce.Lock(_credentials.ApiKey, async nonce =>
+//            {
+//                var (symbol1, symbol2) = CexIoInstrument.FromInstrument(instrument);
+//
+//                var cmd = new EmptyRequest(_credentials, nonce);
+//
+//                using (var response = await Client.PostAsJsonAsync($"open_orders/{symbol1}/{symbol2}", cmd, ct))
+//                {
+//                    response.EnsureSuccessStatusCode();
+//                    var result = await response.Content.ReadAsAsync<ShortOrder[]>(ct);
+//                    return result.Select(x => x.ToOrder(_currencyMapping)).ToArray();
+//                }
+//            });
+//        }
+
+        public async Task<GetLimitOrdersResponse> GetOpenOrders(CancellationToken ct = default(CancellationToken))
         {
-            return EpochNonce.Lock(_credentials.UserId, code);
-        }
-
-        public Task<IReadOnlyCollection<Order>> GetOpenOrdersByInstrument(
-            string instrument,
-            CancellationToken ct = default(CancellationToken))
-        {
-            return WithNonce<IReadOnlyCollection<Order>>(async nonce =>
-            {
-                var (symbol1, symbol2) = CexIoInstrument.FromInstrument(instrument);
-
-                var cmd = new EmptyRequest(_credentials, nonce);
-
-                using (var response = await Client.PostAsJsonAsync($"open_orders/{symbol1}/{symbol2}", cmd, ct))
-                {
-                    response.EnsureSuccessStatusCode();
-                    var result = await response.Content.ReadAsAsync<ShortOrder[]>(ct);
-                    return result.Select(x => x.ToOrder(_currencyMapping, Limit)).ToArray();
-                }
-            });
-        }
-
-        public Task<IReadOnlyCollection<Order>> GetOpenOrders(CancellationToken ct = default(CancellationToken))
-        {
-            return WithNonce<IReadOnlyCollection<Order>>(async nonce =>
+            return await EpochNonce.Lock(_credentials.ApiKey, async nonce =>
             {
                 var cmd = new EmptyRequest(_credentials, nonce);
 
@@ -136,7 +132,10 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
                 {
                     response.EnsureSuccessStatusCode();
                     var result = await response.Content.ReadAsAsync<ShortOrder[]>(ct);
-                    return result.Select(x => x.ToOrder(_currencyMapping, Limit)).ToArray();
+                    return new GetLimitOrdersResponse
+                    {
+                        Orders = result.Select(x => x.ToOrder(_currencyMapping)).ToArray()
+                    };
                 }
             });
         }
@@ -146,7 +145,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
         /// </summary>
         public Task<Order> GetOrder(string id, CancellationToken ct = default(CancellationToken))
         {
-            return WithNonce(async nonce =>
+            return EpochNonce.Lock(_credentials.ApiKey, async nonce =>
             {
                 var cmd = new GetOrderRequest(id, _credentials, nonce);
                 var response = await Client.PostAsJsonAsync("get_order/", cmd, ct);
@@ -161,7 +160,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             PlaceOrderCommand request,
             CancellationToken ct = default(CancellationToken))
         {
-            return WithNonce(async nonce =>
+            return EpochNonce.Lock(_credentials.ApiKey, async nonce =>
             {
                 var cmd = new PlaceOrderRequest(_credentials, nonce)
                 {

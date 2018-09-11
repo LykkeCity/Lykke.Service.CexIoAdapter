@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Common.Log;
+using Lykke.Common.Log;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.WebSocketApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -55,7 +56,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             }
             catch (Exception)
             {
-                Warning($"Cannot read JSON from bytes: {Convert.ToBase64String(message)}");
+                _log.Warning($"Cannot read JSON from bytes: {Convert.ToBase64String(message)}");
                 return null;
             }
 
@@ -67,20 +68,15 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
                 }
                 catch (Exception)
                 {
-                    Warning($"Cannot parse event of type [{envelope.Event}]: {envelope.Json}");
+                    _log.Warning($"Cannot parse event of type [{envelope.Event}]: {envelope.Json}");
                 }
             }
             else
             {
-                Warning($"Received event of unknown type [{envelope.Event}]");
+                _log.Warning($"Received event of unknown type [{envelope.Event}]");
             }
 
             return envelope;
-        }
-
-        private void Warning(string message)
-        {
-            _log.WriteWarning(nameof(CexIoParser), nameof(CexIoParser), message);
         }
     }
 }

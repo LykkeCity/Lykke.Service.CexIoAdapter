@@ -2,17 +2,23 @@
 using System.Linq;
 using Common.Log;
 using Lykke.Common.ExchangeAdapter.Contracts;
+using Lykke.Common.Log;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.WebSocketApi;
 
 namespace Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator
 {
-    public struct OrderBookAggregator
+    public class OrderBookAggregator
     {
+        public OrderBookAggregator(ILogFactory logFactory)
+        {
+            _log = logFactory.CreateLog(this);
+        }
+
         public OrderBook OrderBook;
         private long _version;
-        private ILog _log;
         private string _instrument;
         private string _exchangeName;
+        private ILog _log;
 
         private void ApplyEventToOrderBook(OrderBookUpdate update)
         {
@@ -33,13 +39,12 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator
             OrderBook = newOrderbook;
         }
 
-        public static OrderBookAggregator CreateDefault(ILog log, string exchangeName, string instrument)
+        public static OrderBookAggregator CreateDefault(ILogFactory lf, string exchangeName, string instrument)
         {
-            return new OrderBookAggregator
+            return new OrderBookAggregator(lf)
             {
                 OrderBook = null,
                 _version = 0,
-                _log = log,
                 _exchangeName = exchangeName,
                 _instrument = instrument
             };
@@ -49,9 +54,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator
         {
             if (ev is OrderBookSubscription subscription && OrderBook == null)
             {
-                _log.WriteInfo(
-                    nameof(OrderBookAggregator),
-                    "",
+                _log.Info(
                     $"Received OrderBook for instrument {_instrument} snapshot with {subscription.Asks.Count} asks " +
                     $"and {subscription.Bids.Count} bids");
 

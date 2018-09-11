@@ -1,11 +1,10 @@
-﻿using Lykke.Service.CexIoAdapter.Settings.ServiceSettings;
-using Lykke.Service.CexIoAdapter.Settings.SlackNotifications;
+﻿using Lykke.Sdk.Settings;
+using Lykke.Service.CexIoAdapter.Services.Settings;
 
 namespace Lykke.Service.CexIoAdapter.Settings
 {
-    public class AppSettings
+    public class AppSettings : BaseAppSettings
     {
         public CexIoAdapterSettings CexIoAdapterService { get; set; }
-        public SlackNotificationsSettings SlackNotifications { get; set; }
     }
 }

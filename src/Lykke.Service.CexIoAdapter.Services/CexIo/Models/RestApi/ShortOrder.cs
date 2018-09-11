@@ -1,6 +1,7 @@
 ﻿using System;
-using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
-using Lykke.Service.CexIoAdapter.Core.Domain.SharedContracts;
+using Lykke.Common.ExchangeAdapter.Contracts;
+using Lykke.Common.ExchangeAdapter.SpotController.Records;
+using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Services.Tools;
 using Newtonsoft.Json;
 
@@ -33,18 +34,32 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
         [JsonProperty("symbol2")]
         public string Symbol2 { get; set; }
 
-        public Order ToOrder(CurrencyMapping mapping, string orderType)
+        public OrderModel ToOrder(CurrencyMapping mapping)
         {
             var instrument = CexIoInstrument.FromPair(Symbol1, Symbol2);
 
-            return new Order
+            TradeType type;
+
+            switch (Type?.ToLowerInvariant())
             {
-                OrderId = Id,
-                Instrument = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
+                case "buy":
+                    type = TradeType.Buy;
+                    break;
+                case "sell":
+                    type = TradeType.Sell;
+                    break;
+                default:
+                    throw new InvalidOperationException($"Type {Type} is unknown");
+
+            }
+
+            return new OrderModel
+            {
+                Id = Id,
+                Symbol = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
                 Price = Price,
-                Volume = Amount,
-                OrderType = orderType,
-                TradeType = Type
+                OriginalVolume = Amount,
+                TradeType = type
             };
         }
     }

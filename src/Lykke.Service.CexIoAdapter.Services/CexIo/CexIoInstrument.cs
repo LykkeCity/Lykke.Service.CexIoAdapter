@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Lykke.Service.CexIoAdapter.Core.Domain.CexIo;
+using Lykke.Service.CexIoAdapter.Services.Settings;
 
 namespace Lykke.Service.CexIoAdapter.Services.CexIo
 {
