@@ -1,7 +1,4 @@
-﻿using System;
-using Lykke.Common.ExchangeAdapter.Server.Settings;
-
-namespace Lykke.Service.CexIoAdapter.Services.Settings
+﻿namespace Lykke.Service.CexIoAdapter.Services.Settings
 {
     public sealed class OrderBookSettings
     {

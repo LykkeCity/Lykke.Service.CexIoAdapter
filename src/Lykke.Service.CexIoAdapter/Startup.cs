@@ -2,7 +2,6 @@
 using System.Linq;
 using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Server;
-using Lykke.Common.Log;
 using Lykke.Sdk;
 using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Services.CexIo;

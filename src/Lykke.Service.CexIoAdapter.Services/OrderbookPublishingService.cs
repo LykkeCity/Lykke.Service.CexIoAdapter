@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Text.Unicode;
 using System.Threading;
 using System.Threading.Tasks;
 using Common.Log;
@@ -18,7 +16,6 @@ using Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator;
 using Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Microsoft.Extensions.Hosting;
-using Nexogen.Libraries.Metrics;
 
 namespace Lykke.Service.CexIoAdapter.Services
 {

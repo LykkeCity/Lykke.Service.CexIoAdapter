@@ -1,6 +1,5 @@
 ﻿using Autofac;
 using Lykke.Service.CexIoAdapter.Services;
-using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.Hosting;
