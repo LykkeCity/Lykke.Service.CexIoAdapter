@@ -1,8 +1,9 @@
 ﻿using System;
+using Lykke.Common.ExchangeAdapter.Contracts;
+using Lykke.Common.ExchangeAdapter.SpotController.Records;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Services.Tools;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
 {
@@ -17,7 +18,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
         [JsonProperty("time"), JsonConverter(typeof(EpochConverter))]
         public DateTime Time { get; set; }
 
-        [JsonProperty("lastTxTime"), JsonConverter(typeof(IsoDateTimeConverter))]
+        [JsonProperty("lastTxTime"), JsonConverter(typeof(EpochConverter))]
         public DateTime LastTxTime { get; set; }
 
         [JsonProperty("lastTx")]
@@ -59,18 +60,21 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
         [JsonProperty("orderId")]
         public string OrderId { get; set; }
 
-        public Order ToOrder(CurrencyMapping mapping, string orderType)
+        public OrderModel ToOrder(CurrencyMapping mapping, string orderType)
         {
             var instrument = CexIoInstrument.FromPair(Symbol1, Symbol2);
 
-            return new Order
+            return new OrderModel
             {
-                OrderId = Id,
-                Instrument = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
+                Id = Id,
+                TradeType = Enum.Parse<TradeType>(Type, true),
                 Price = Price,
-                Volume = Amount,
-                OrderType = orderType,
-                TradeType = Type
+                Timestamp = Time,
+                RemainingAmount = Remains,
+                Symbol = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
+                OriginalVolume = Amount,
+                ExecutedVolume = Amount - Remains,
+                ExecutionStatus = Status.ToOrderStatus()
             };
         }
     }

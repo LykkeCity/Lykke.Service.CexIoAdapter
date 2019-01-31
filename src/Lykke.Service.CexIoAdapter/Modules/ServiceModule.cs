@@ -1,4 +1,5 @@
 ﻿using Autofac;
+using JetBrains.Annotations;
 using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Settings;
 using Lykke.SettingsReader;
@@ -7,6 +8,7 @@ using Nexogen.Libraries.Metrics.Prometheus;
 
 namespace Lykke.Service.CexIoAdapter.Modules
 {
+    [UsedImplicitly]
     public class ServiceModule : Module
     {
         private readonly IReloadingManager<AppSettings> _settings;

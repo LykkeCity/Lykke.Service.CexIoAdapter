@@ -59,7 +59,10 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
                 Symbol = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
                 Price = Price,
                 OriginalVolume = Amount,
-                TradeType = type
+                TradeType = type,
+                Timestamp = Time,
+                RemainingAmount = Pending,
+                ExecutedVolume = Amount - Pending
             };
         }
     }
