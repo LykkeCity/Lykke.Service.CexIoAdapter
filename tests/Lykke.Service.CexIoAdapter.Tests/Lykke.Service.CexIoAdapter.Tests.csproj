@@ -4,6 +4,7 @@
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="2.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="NUnit" Version="3.11.0" />
@@ -26,5 +27,6 @@
       <Project>{2D5F52EC-2A27-4045-81ED-72355E2A6325}</Project>
       <Name>Lykke.Service.CexIoAdapter.Services</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\src\Lykke.Service.CexIoAdapter\Lykke.Service.CexIoAdapter.csproj" />
   </ItemGroup>
 </Project>
