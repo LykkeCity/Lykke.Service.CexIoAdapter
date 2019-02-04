@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Linq;
-using System.Reflection;
-using Autofac;
 using JetBrains.Annotations;
+using Lykke.Common;
+using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Common.ExchangeAdapter.Server;
+using Lykke.Logs;
 using Lykke.Sdk;
-using Lykke.Service.CexIoAdapter.Modules;
 using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
+using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 using Nexogen.Libraries.Metrics.Prometheus.AspCore;
 
 namespace Lykke.Service.CexIoAdapter
@@ -48,20 +51,54 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
-            services.BuildServiceProvider<AppSettings>(options =>
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    options.SerializerSettings.ContractResolver =
+                        new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                });
+
+            var configurationRoot = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+
+            var settings = configurationRoot.LoadSettings<AppSettings>(options =>
             {
-                options.Logs = logs =>
-                {
-                    logs.UseEmptyLogging();
-                };
-
-                options.Extend = (collection, manager) =>
-                {
-                    collection.AddSingleton(manager.CurrentValue.CexIoAdapterService);
-                };
-
-                options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
+                options.SetConnString(x => x.SlackNotifications.AzureQueue.ConnectionString);
+                options.SetQueueName(x => x.SlackNotifications.AzureQueue.QueueName);
+                options.SenderName = $"{AppEnvironment.Name} {AppEnvironment.Version}";
             });
+
+            services.AddLykkeLogging(
+                settings.ConnectionString(x => x.CexIoAdapterService.Db.LogsConnString),
+                "CexIoAdapterLog",
+                settings.CurrentValue.SlackNotifications.AzureQueue.ConnectionString,
+                settings.CurrentValue.SlackNotifications.AzureQueue.QueueName);
+
+            services.AddSwaggerGen(options =>
+            {
+                options.DefaultLykkeConfiguration(
+                    "v1",
+                    "CexIoAdapterService Test");
+            });
+
+            services.AddSingleton(settings.CurrentValue.CexIoAdapterService);
+
+            //services.BuildServiceProvider<AppSettings>(options =>
+            //{
+            //    options.Logs = logs =>
+            //    {
+            //        logs.UseEmptyLogging();
+            //    };
+
+            //    options.Extend = (collection, manager) =>
+            //    {
+            //        collection.AddSingleton(manager.CurrentValue.CexIoAdapterService);
+            //    };
+
+            //    options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
+            //});
         }
 
         [UsedImplicitly]
