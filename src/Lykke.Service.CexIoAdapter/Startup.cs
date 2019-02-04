@@ -1,19 +1,25 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
-using Common;
 using JetBrains.Annotations;
+using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.Log;
+using Lykke.Logs;
 using Lykke.Sdk;
 using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
+using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 using Nexogen.Libraries.Metrics.Prometheus.AspCore;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Lykke.Service.CexIoAdapter
 {
@@ -48,38 +54,54 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
-            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    options.SerializerSettings.ContractResolver =
+                        new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                });
 
-            Console.WriteLine($"Read settingsUrl env variable: {settingsUrl}");
+            var configurationRoot = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
 
-            Console.WriteLine("About to get settings from settings service ...");
+            // @atarutin: Workaround to load settings manually since there are troubles with latest
+            // Lykke.SettingsReader library version and HttpClient instance initialization when
+            // executing tests with TeamCity
+            var settingsUrl = configurationRoot[SettingsConfiguratorExtensions.DefaultConfigurationKey];
 
-            //var settings = HttpClientProvider.Client.GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+            if (string.IsNullOrEmpty(settingsUrl))
+                throw new InvalidOperationException("SettingsUrl variable is empty");
 
-            string settings = String.Empty;
+            string settingsContent;
 
-            using (var client = new HttpClient())
+            if (settingsUrl.StartsWith("http"))
             {
-                settings = client.GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+                using (var httpClient = new HttpClient())
+                {
+                    settingsContent = httpClient.GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+                }
+            }
+            else
+            {
+                using (var reader = File.OpenText(settingsUrl))
+                {
+                    settingsContent = reader.ReadToEndAsync().GetAwaiter().GetResult();
+                }
             }
 
-            Console.WriteLine("Successfully read settings from settings service");
+            var settings = JsonConvert.DeserializeObject<AppSettings>(settingsContent);
 
-            Console.WriteLine($"Settings: {settings.ToJson()}");
+            services.AddSingleton(settings.CexIoAdapterService);
 
-            services.BuildServiceProvider<AppSettings>(options =>
+            services.AddEmptyLykkeLogging();
+
+            services.AddSwaggerGen(options =>
             {
-                options.Logs = logs =>
-                {
-                    logs.UseEmptyLogging();
-                };
-
-                options.Extend = (collection, manager) =>
-                {
-                    collection.AddSingleton(manager.CurrentValue.CexIoAdapterService);
-                };
-
-                options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
+                options.DefaultLykkeConfiguration(
+                    _swaggerOptions.ApiVersion,
+                    $"{_swaggerOptions.ApiTitle} Under Test");
             });
         }
 
