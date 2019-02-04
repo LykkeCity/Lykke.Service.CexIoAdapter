@@ -1,18 +1,25 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using JetBrains.Annotations;
+using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.Log;
+using Lykke.Logs;
 using Lykke.Sdk;
 using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
+using Lykke.SettingsReader;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Converters;
 using Nexogen.Libraries.Metrics.Prometheus.AspCore;
+using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Lykke.Service.CexIoAdapter
 {
@@ -47,19 +54,54 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
-            services.BuildServiceProvider<AppSettings>(options =>
+            services.AddMvc()
+                .AddJsonOptions(options =>
+                {
+                    options.SerializerSettings.Converters.Add(new StringEnumConverter());
+                    options.SerializerSettings.ContractResolver =
+                        new Newtonsoft.Json.Serialization.DefaultContractResolver();
+                });
+
+            var configurationRoot = new ConfigurationBuilder()
+                .AddEnvironmentVariables()
+                .Build();
+
+            // @atarutin: Workaround to load settings manually since there are troubles with latest
+            // Lykke.SettingsReader library version and HttpClient instance initialization when
+            // executing tests with TeamCity
+            var settingsUrl = configurationRoot[SettingsConfiguratorExtensions.DefaultConfigurationKey];
+
+            if (string.IsNullOrEmpty(settingsUrl))
+                throw new InvalidOperationException("SettingsUrl variable is empty");
+
+            string settingsContent;
+
+            if (settingsUrl.StartsWith("http"))
             {
-                options.Logs = logs =>
+                using (var httpClient = new HttpClient())
                 {
-                    logs.UseEmptyLogging();
-                };
-
-                options.Extend = (collection, manager) =>
+                    settingsContent = httpClient.GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+                }
+            }
+            else
+            {
+                using (var reader = File.OpenText(settingsUrl))
                 {
-                    collection.AddSingleton(manager.CurrentValue.CexIoAdapterService);
-                };
+                    settingsContent = reader.ReadToEndAsync().GetAwaiter().GetResult();
+                }
+            }
 
-                options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
+            var settings = JsonConvert.DeserializeObject<AppSettings>(settingsContent);
+
+            services.AddSingleton(settings.CexIoAdapterService);
+
+            services.AddEmptyLykkeLogging();
+
+            services.AddSwaggerGen(options =>
+            {
+                options.DefaultLykkeConfiguration(
+                    _swaggerOptions.ApiVersion,
+                    $"{_swaggerOptions.ApiTitle} Under Test");
             });
         }
 
