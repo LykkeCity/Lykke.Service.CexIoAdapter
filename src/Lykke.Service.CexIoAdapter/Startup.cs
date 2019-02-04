@@ -47,8 +47,6 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
-            Console.WriteLine("About to call BuildServiceProvider.");
-
             services.BuildServiceProvider<AppSettings>(options =>
             {
                 options.Logs = logs =>
@@ -63,8 +61,6 @@ namespace Lykke.Service.CexIoAdapter
 
                 options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
             });
-
-            Console.WriteLine("BuildServiceProvider successfully passed!");
         }
 
         [UsedImplicitly]
