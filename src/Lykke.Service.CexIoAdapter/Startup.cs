@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Http;
 using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.Log;
@@ -60,6 +61,20 @@ namespace Lykke.Service.CexIoAdapter
 
                 options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
             });
+
+            // experiment
+
+            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
+
+            Console.WriteLine($"Settings url = {settingsUrl}");
+
+            Console.WriteLine("About to start reading settings");
+
+            var settings = new HttpClient().GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+
+            Console.WriteLine("Finished reading settings");
+
+            Console.WriteLine($"Settings: {settings}");
         }
 
         [UsedImplicitly]
