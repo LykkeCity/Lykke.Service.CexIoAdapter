@@ -52,6 +52,8 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
+            Environment.SetEnvironmentVariable("SettingsUrl", "https://settings-dev-k8s.lykkex.net/6f78ad71-8a6a-6e3f-bf04-16309addbf4f_CexIoAdapter");
+
             services.AddMvc()
                 .AddJsonOptions(options =>
                 {
@@ -63,8 +65,6 @@ namespace Lykke.Service.CexIoAdapter
             var configurationRoot = new ConfigurationBuilder()
                 .AddEnvironmentVariables()
                 .Build();
-
-            Environment.SetEnvironmentVariable("SettingsUrl", "https://settings-dev-k8s.lykkex.net/6f78ad71-8a6a-6e3f-bf04-16309addbf4f_CexIoAdapter");
 
             var settings = configurationRoot.LoadSettings<AppSettings>(options =>
             {
