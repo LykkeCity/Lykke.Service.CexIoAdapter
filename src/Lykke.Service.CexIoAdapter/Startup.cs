@@ -64,6 +64,8 @@ namespace Lykke.Service.CexIoAdapter
                 .AddEnvironmentVariables()
                 .Build();
 
+            Environment.SetEnvironmentVariable("SettingsUrl", "https://settings-dev-k8s.lykkex.net/6f78ad71-8a6a-6e3f-bf04-16309addbf4f_CexIoAdapter");
+
             var settings = configurationRoot.LoadSettings<AppSettings>(options =>
             {
                 options.SetConnString(x => x.SlackNotifications.AzureQueue.ConnectionString);
