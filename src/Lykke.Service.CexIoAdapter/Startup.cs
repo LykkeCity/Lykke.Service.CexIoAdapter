@@ -47,6 +47,20 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
+            // experiment
+
+            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
+
+            Console.WriteLine($"Settings url = {settingsUrl}");
+
+            Console.WriteLine("About to start reading settings");
+
+            var settings = new HttpClient().GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+
+            Console.WriteLine("Finished reading settings");
+
+            Console.WriteLine($"Settings: {settings}");
+
             services.BuildServiceProvider<AppSettings>(options =>
             {
                 options.Logs = logs =>
@@ -61,20 +75,6 @@ namespace Lykke.Service.CexIoAdapter
 
                 options.SwaggerOptions = new LykkeSwaggerOptions { ApiTitle = "CexIoAdapterService Test" };
             });
-
-            // experiment
-
-            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
-
-            Console.WriteLine($"Settings url = {settingsUrl}");
-
-            Console.WriteLine("About to start reading settings");
-
-            var settings = new HttpClient().GetStringAsync(settingsUrl).GetAwaiter().GetResult();
-
-            Console.WriteLine("Finished reading settings");
-
-            Console.WriteLine($"Settings: {settings}");
         }
 
         [UsedImplicitly]
