@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using Lykke.Common;
 using Lykke.Common.ApiLibrary.Swagger;
 using Lykke.Common.ExchangeAdapter.Server;
+using Lykke.Common.Log;
 using Lykke.Logs;
 using Lykke.Sdk;
 using Lykke.Service.CexIoAdapter.Services;
@@ -105,7 +106,7 @@ namespace Lykke.Service.CexIoAdapter
         public void Configure(IApplicationBuilder app)
         {
             var settings = app.ApplicationServices.GetService<CexIoAdapterSettings>();
-            // var logFactory = app.ApplicationServices.GetService<ILogFactory>();
+            var logFactory = app.ApplicationServices.GetService<ILogFactory>();
 
             XApiKeyAuthAttribute.Credentials =
                 settings.Clients.ToDictionary(x => x.InternalApiKey, x => (object) x);
@@ -123,7 +124,8 @@ namespace Lykke.Service.CexIoAdapter
                 {
                     x.UseAuthenticationMiddleware(token => new CexIoRestClient(
                         GetCredentials(settings, token),
-                        settings.OrderBooks.CurrencyMapping));
+                        settings.OrderBooks.CurrencyMapping,
+                        logFactory));
                     x.UseHandleBusinessExceptionsMiddleware();
                     x.UseMiddleware<CollectMetricsMiddleware>();
                 };
@@ -134,6 +136,7 @@ namespace Lykke.Service.CexIoAdapter
         public void ConfigureTest(IApplicationBuilder app, IHostingEnvironment env, IApplicationLifetime appLifetime)
         {
             var settings = app.ApplicationServices.GetService<CexIoAdapterSettings>();
+            var logFactory = app.ApplicationServices.GetService<ILogFactory>();
 
             XApiKeyAuthAttribute.Credentials =
                 settings.Clients.ToDictionary(x => x.InternalApiKey, x => (object)x);
@@ -144,7 +147,8 @@ namespace Lykke.Service.CexIoAdapter
                 {
                     x.UseAuthenticationMiddleware(token => new CexIoRestClient(
                         GetCredentials(settings, token),
-                        settings.OrderBooks.CurrencyMapping));
+                        settings.OrderBooks.CurrencyMapping,
+                        logFactory));
                     x.UseHandleBusinessExceptionsMiddleware();
                 };
             });

@@ -5,7 +5,9 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Lykke.Common.ExchangeAdapter;
+using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.ExchangeAdapter.SpotController.Records;
+using Lykke.Common.Log;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Services.Tools;
@@ -13,22 +15,22 @@ using Newtonsoft.Json.Linq;
 
 namespace Lykke.Service.CexIoAdapter.Services.CexIo
 {
-    public class CexIoRestClient
+    public sealed class CexIoRestClient
     {
         private readonly IApiCredentials _credentials;
         private readonly CurrencyMapping _currencyMapping;
-
-        private static readonly HttpClient Client = new HttpClient
-        {
-            BaseAddress = new Uri("https://cex.io/api/")
-        };
+        private readonly HttpClient _client;
 
         private const string Limit = "limit";
 
-        public CexIoRestClient(IApiCredentials credentials, CurrencyMapping currencyMapping)
+        public CexIoRestClient(IApiCredentials credentials, CurrencyMapping currencyMapping, ILogFactory logFactory)
         {
             _credentials = credentials;
             _currencyMapping = currencyMapping;
+            _client = new HttpClient(new LoggingHandler(logFactory.CreateLog(this), new HttpClientHandler()))
+            {
+                BaseAddress = new Uri("https://cex.io/api/")
+            };
         }
 
         public async Task<OrderBookSnapshot> GetOrderBook(
@@ -37,7 +39,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
         {
             var (symbol1, symbol2) = CexIoInstrument.FromInstrument(instrument);
 
-            using (var r = await Client.GetAsync($"order_book/{symbol1}/{symbol2}", ct))
+            using (var r = await _client.GetAsync($"order_book/{symbol1}/{symbol2}", ct))
             {
                 return await r.Content.ReadAsAsync<OrderBookSnapshot>(ct);
             }
@@ -49,7 +51,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             {
                 var cmd = EmptyRequest(nonce);
 
-                using (var response = await Client.PostAsJsonAsync("balance/", cmd, ct))
+                using (var response = await _client.PostAsJsonAsync("balance/", cmd, ct))
                 {
                     response.EnsureSuccessStatusCode();
 
@@ -68,7 +70,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
         public async Task<IReadOnlyCollection<CurrencyLimitInfo>> GetCurrencyLimits(
             CancellationToken ct = default(CancellationToken))
         {
-            var response = await Client.GetAsAsync<CurrencyLimitsResponse>("currency_limits", ct);
+            var response = await _client.GetAsAsync<CurrencyLimitsResponse>("currency_limits", ct);
             if (!string.IsNullOrEmpty(response.Error)) throw new Exception($"Erroneous response: {response.Error}");
             return response.Data.Pairs;
         }
@@ -79,7 +81,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             {
                 var cmd = new EmptyRequest(_credentials, nonce);
 
-                using (var response = await Client.PostAsJsonAsync("open_orders/", cmd, ct))
+                using (var response = await _client.PostAsJsonAsync("open_orders/", cmd, ct))
                 {
                     response.EnsureSuccessStatusCode();
 
@@ -106,7 +108,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             {
                 var cmd = new GetOrderRequest(id, _credentials, nonce);
 
-                var response = await Client.PostAsJsonAsync("get_order/", cmd, ct);
+                var response = await _client.PostAsJsonAsync("get_order/", cmd, ct);
 
                 response.EnsureSuccessStatusCode();
 
@@ -136,7 +138,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 
                 var (symbol1, symbol2) = CexIoInstrument.FromInstrument(instrument);
 
-                using (var response = await Client.PostAsJsonAsync($"place_order/{symbol1}/{symbol2}", cmd, ct))
+                using (var response = await _client.PostAsJsonAsync($"place_order/{symbol1}/{symbol2}", cmd, ct))
                 {
                     response.EnsureSuccessStatusCode();
 
@@ -155,7 +157,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
             {
                 var cmd = new CancelOrderRequest(orderId, _credentials, nonce);
 
-                using (var response = await Client.PostAsJsonAsync("cancel_order/", cmd, ct))
+                using (var response = await _client.PostAsJsonAsync("cancel_order/", cmd, ct))
                 {
                     response.EnsureSuccessStatusCode();
 
