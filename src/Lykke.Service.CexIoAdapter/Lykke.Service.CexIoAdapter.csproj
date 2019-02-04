@@ -26,6 +26,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="4.4.1" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
     <PackageReference Include="Nexogen.Libraries.Metrics.Prometheus.AspCore" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>

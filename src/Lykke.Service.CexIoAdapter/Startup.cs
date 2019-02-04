@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
+using Common;
 using JetBrains.Annotations;
 using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.Log;
@@ -47,6 +48,25 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public void ConfigureTestServices(IServiceCollection services)
         {
+            var settingsUrl = Environment.GetEnvironmentVariable("SettingsUrl");
+
+            Console.WriteLine($"Read settingsUrl env variable: {settingsUrl}");
+
+            Console.WriteLine("About to get settings from settings service ...");
+
+            //var settings = HttpClientProvider.Client.GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+
+            string settings = String.Empty;
+
+            using (var client = new HttpClient())
+            {
+                settings = client.GetStringAsync(settingsUrl).GetAwaiter().GetResult();
+            }
+
+            Console.WriteLine("Successfully read settings from settings service");
+
+            Console.WriteLine($"Settings: {settings.ToJson()}");
+
             services.BuildServiceProvider<AppSettings>(options =>
             {
                 options.Logs = logs =>
