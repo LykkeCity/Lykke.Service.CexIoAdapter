@@ -56,7 +56,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
             return new OrderModel
             {
                 Id = Id,
-                Symbol = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
+                AssetPair = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
                 Price = Price,
                 OriginalVolume = Amount,
                 TradeType = type,

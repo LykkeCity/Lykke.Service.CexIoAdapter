@@ -71,7 +71,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi
                 Price = Price,
                 Timestamp = Time,
                 RemainingAmount = Remains,
-                Symbol = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
+                AssetPair = CexIoInstrument.ToLykkeInstrument(instrument, mapping),
                 OriginalVolume = Amount,
                 ExecutedVolume = Amount - Remains,
                 ExecutionStatus = Status.ToOrderStatus()
