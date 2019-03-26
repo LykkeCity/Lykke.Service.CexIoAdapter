@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Lykke.Common.ExchangeAdapter.Contracts;
+using Lykke.Logs;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
 using Lykke.Service.CexIoAdapter.Services.CexIo.Models.RestApi;
 using Lykke.Service.CexIoAdapter.Services.Settings;
@@ -35,7 +36,7 @@ namespace Lykke.Service.CexIoAdapter.Tests
         [Fact]
         public async Task get_currency_limits()
         {
-            var rest = new CexIoRestClient(new InternalApiCredentials(), _mapping);
+            var rest = new CexIoRestClient(new InternalApiCredentials(), _mapping, EmptyLogFactory.Instance);
             var limits = await rest.GetCurrencyLimits();
             Assert.NotEmpty(limits);
         }

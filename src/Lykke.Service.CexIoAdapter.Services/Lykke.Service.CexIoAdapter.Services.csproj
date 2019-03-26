@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <AssemblyName>Lykke.Service.CexIoAdapter.Services</AssemblyName>
     <RootNamespace>Lykke.Service.CexIoAdapter.Services</RootNamespace>
     <Version>1.0.0</Version>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="4.1.1" />
-    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.6" />
+    <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="5.1.0" />
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Nexogen.Libraries.Metrics.Prometheus.AspCore" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>

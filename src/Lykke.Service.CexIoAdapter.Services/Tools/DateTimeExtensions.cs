@@ -12,9 +12,14 @@ namespace Lykke.Service.CexIoAdapter.Services.Tools
             return (long) (dt - BaseDateTime).TotalSeconds;
         }
 
-        public static DateTime FromEpoch(this long timestamp)
+        public static DateTime FromEpochMilliSeconds(this long milliseconds)
         {
-            return BaseDateTime.AddSeconds(timestamp);
+            return BaseDateTime.AddMilliseconds(milliseconds);
+        }
+
+        public static DateTime FromEpochSeconds(this long seconds)
+        {
+            return BaseDateTime.AddSeconds(seconds);
         }
     }
 }

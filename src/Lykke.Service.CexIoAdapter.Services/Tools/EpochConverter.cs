@@ -14,7 +14,12 @@ namespace Lykke.Service.CexIoAdapter.Services.Tools
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return (long?) reader.Value;
+            if (long.TryParse(reader.Value?.ToString(), out long result))
+            {
+                return result.FromEpochMilliSeconds();
+            }
+
+            return null;
         }
     }
 }

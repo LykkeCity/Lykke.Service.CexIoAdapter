@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <OutputType>Exe</OutputType>
     <Version>1.0.1</Version>
     <AssemblyName>Lykke.Service.CexIoAdapter</AssemblyName>
@@ -20,9 +20,12 @@
     <None Update="Dockerfile">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
+    <None Update="Properties\launchSettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="4.1.1" />
+    <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="5.1.0" />
     <PackageReference Include="Nexogen.Libraries.Metrics.Prometheus.AspCore" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>

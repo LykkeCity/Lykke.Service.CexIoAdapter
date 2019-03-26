@@ -1,6 +1,6 @@
 ﻿using Autofac;
+using JetBrains.Annotations;
 using Lykke.Service.CexIoAdapter.Services;
-using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
 using Lykke.SettingsReader;
 using Microsoft.Extensions.Hosting;
@@ -8,6 +8,7 @@ using Nexogen.Libraries.Metrics.Prometheus;
 
 namespace Lykke.Service.CexIoAdapter.Modules
 {
+    [UsedImplicitly]
     public class ServiceModule : Module
     {
         private readonly IReloadingManager<AppSettings> _settings;
@@ -20,11 +21,6 @@ namespace Lykke.Service.CexIoAdapter.Modules
         protected override void Load(ContainerBuilder builder)
         {
             builder.RegisterType<OrderbookPublishingService>()
-                .AsSelf()
-                .As<IHostedService>()
-                .SingleInstance();
-
-            builder.RegisterType<MetricsServer>()
                 .AsSelf()
                 .As<IHostedService>()
                 .SingleInstance();
