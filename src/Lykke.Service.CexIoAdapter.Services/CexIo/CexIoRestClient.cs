@@ -136,7 +136,8 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
                     Price = request.Price
                 };
 
-                var (symbol1, symbol2) = CexIoInstrument.FromInstrument(instrument);
+                var (symbol1, symbol2) =
+                    CexIoInstrument.FromInstrument(CexIoInstrument.FromLykkeInstrument(instrument, _currencyMapping));
 
                 using (var response = await _client.PostAsJsonAsync($"place_order/{symbol1}/{symbol2}", cmd, ct))
                 {
