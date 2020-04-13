@@ -94,6 +94,7 @@ namespace Lykke.Service.CexIoAdapter.Services
             {
                 var limits = (await restApi.GetCurrencyLimits(ct.Token)).ToList();
                 var instruments = new List<string>();
+                var skippedInstruments = new List<string>();
                 var result = new List<(string, string)>();
 
                 foreach (var currencyInfo in limits)
@@ -101,13 +102,17 @@ namespace Lykke.Service.CexIoAdapter.Services
                     string instrument = CexIoInstrument.FromPair(currencyInfo.Symbol1, currencyInfo.Symbol2, false);
 
                     if (instrument == null)
+                    {
+                        skippedInstruments.Add($"{currencyInfo.Symbol1}:{currencyInfo.Symbol2}");
                         continue;
+                    }
 
                     instruments.Add(instrument);
                     result.Add((currencyInfo.Symbol1, currencyInfo.Symbol2));
                 }
 
                 _log.Info($"Got instruments: {string.Join(", ", instruments)}");
+                _log.Info($"Skipped instruments: {string.Join(", ", skippedInstruments)}");
                 return result.ToArray();
             }
         }
