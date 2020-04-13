@@ -7,10 +7,21 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
 {
     public static class CexIoInstrument
     {
-        public static string FromPair(string symbol1, string symbol2)
+        public static string FromPair(string symbol1, string symbol2, bool throwException = true)
         {
-            AssertIsSymbol(symbol1);
-            AssertIsSymbol(symbol2);
+            try
+            {
+                AssertIsSymbol(symbol1);
+                AssertIsSymbol(symbol2);
+            }
+            catch (Exception)
+            {
+                if (throwException)
+                    throw;
+
+                return null;
+            }
+
             return $"{symbol1}:{symbol2}";
         }
 
