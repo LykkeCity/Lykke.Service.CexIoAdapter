@@ -92,10 +92,23 @@ namespace Lykke.Service.CexIoAdapter.Services
             _log.Info("Getting currency limits from REST API");
             using (var ct = new CancellationTokenSource(_orderBookSettings.Timeouts.RetrieveCurrencyLimits))
             {
-                var limits = await restApi.GetCurrencyLimits(ct.Token);
-                var instruments = limits.Select(x => CexIoInstrument.FromPair(x.Symbol1, x.Symbol2));
+                var limits = (await restApi.GetCurrencyLimits(ct.Token)).ToList();
+                var instruments = new List<string>();
+                var result = new List<(string, string)>();
+
+                foreach (var currencyInfo in limits)
+                {
+                    string instrument = CexIoInstrument.FromPair(currencyInfo.Symbol1, currencyInfo.Symbol2, false);
+
+                    if (instrument == null)
+                        continue;
+
+                    instruments.Add(instrument);
+                    result.Add((currencyInfo.Symbol1, currencyInfo.Symbol2));
+                }
+
                 _log.Info($"Got instruments: {string.Join(", ", instruments)}");
-                return limits.Select(l => (l.Symbol1, l.Symbol2)).ToArray();
+                return result.ToArray();
             }
         }
 
