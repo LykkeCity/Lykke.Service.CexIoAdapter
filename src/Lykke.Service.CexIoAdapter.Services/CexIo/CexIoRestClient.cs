@@ -64,7 +64,7 @@ namespace Lykke.Service.CexIoAdapter.Services.CexIo
                         Wallets = ParseAmounts(token.ToObject<JObject>()).ToArray()
                     };
                 }
-            });
+            }, LockKind.EpochMilliseconds);
         }
 
         public async Task<IReadOnlyCollection<CurrencyLimitInfo>> GetCurrencyLimits(
