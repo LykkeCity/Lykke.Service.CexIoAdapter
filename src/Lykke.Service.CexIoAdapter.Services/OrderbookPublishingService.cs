@@ -15,6 +15,7 @@ using Lykke.Service.CexIoAdapter.Services.CexIo.Models.WebSocketApi;
 using Lykke.Service.CexIoAdapter.Services.CexIo.OrderbookAggregator;
 using Lykke.Service.CexIoAdapter.Services.CexIo.WebSocket;
 using Lykke.Service.CexIoAdapter.Services.Settings;
+using Lykke.Service.CexIoAdapter.Services.Utils;
 using Microsoft.Extensions.Hosting;
 
 namespace Lykke.Service.CexIoAdapter.Services
@@ -33,23 +34,30 @@ namespace Lykke.Service.CexIoAdapter.Services
             _logFactory = lf;
             _orderBookSettings = settings.OrderBooks;
 
-            var rawOrderBooks = CalculateOrderBooks(GetRawOrderBooks());
+            var rawOrderBooks = GetRawOrderBooks();
 
             Session = OrderBooksSession.FromRawOrderBooks(
                 rawOrderBooks,
                 settings.ToCommonSettings(),
                 lf);
-        }
 
-        private IObservable<OrderBook> CalculateOrderBooks(IObservable<OrderBook> rawOrderBooks)
-        {
-            var counter = Metrics.Prometheus.Counter()
-                .Name("orderbook_received_count_total")
-                .Help("Total counts of order books received from web-socket")
-                .LabelNames("source", "asset")
-                .Register();
+            Session.TickPrices.Subscribe(x =>
+            {
+                foreach (var tickPrice in x)
+                {
+                    InternalMetrics.QuoteOutCount
+                        .WithLabels(tickPrice.Asset)
+                        .Inc();
 
-            return rawOrderBooks.Do(ob => counter.Labels(ob.Source, ob.Asset).Increment());
+                    InternalMetrics.QuoteOutSidePrice
+                        .WithLabels(tickPrice.Asset, "ask")
+                        .Set((double) tickPrice.Ask);
+
+                    InternalMetrics.QuoteOutSidePrice
+                        .WithLabels(tickPrice.Asset, "bid")
+                        .Set((double) tickPrice.Bid);
+                }
+            });
         }
 
         private IObservable<OrderBook> GetRawOrderBooks()

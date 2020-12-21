@@ -19,10 +19,6 @@
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Lykke.Service.CexIoAdapter.Core\Lykke.Service.CexIoAdapter.Core.csproj">
-      <Project>{F5B2F6B8-A8CC-4612-8F1D-C063EB8C8955}</Project>
-      <Name>Lykke.Service.CexIoAdapter.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\src\Lykke.Service.CexIoAdapter.Services\Lykke.Service.CexIoAdapter.Services.csproj">
       <Project>{2D5F52EC-2A27-4045-81ED-72355E2A6325}</Project>
       <Name>Lykke.Service.CexIoAdapter.Services</Name>

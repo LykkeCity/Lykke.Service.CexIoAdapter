@@ -8,7 +8,6 @@ using Lykke.Common.ExchangeAdapter.Server;
 using Lykke.Common.Log;
 using Lykke.Logs;
 using Lykke.Sdk;
-using Lykke.Service.CexIoAdapter.Services;
 using Lykke.Service.CexIoAdapter.Services.CexIo;
 using Lykke.Service.CexIoAdapter.Services.Settings;
 using Lykke.Service.CexIoAdapter.Settings;
@@ -18,7 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Converters;
-using Nexogen.Libraries.Metrics.Prometheus.AspCore;
+using Prometheus;
 using JsonConvert = Newtonsoft.Json.JsonConvert;
 
 namespace Lykke.Service.CexIoAdapter
@@ -34,9 +33,6 @@ namespace Lykke.Service.CexIoAdapter
         [UsedImplicitly]
         public IServiceProvider ConfigureServices(IServiceCollection services)
         {
-            services.AddPrometheus(Metrics.Prometheus);
-            services.AddSingleton(new HttpMetrics(Metrics.Prometheus));
-
             return services.BuildServiceProvider<AppSettings>(options =>
             {
                 options.Logs = logs =>
@@ -114,11 +110,6 @@ namespace Lykke.Service.CexIoAdapter
             XApiKeyAuthAttribute.Credentials =
                 settings.Clients.ToDictionary(x => x.InternalApiKey, x => (object) x);
 
-//            app.UsePrometheus(options =>
-//            {
-//                options.CollectHttpMetrics();
-//            });
-
             app.UseLykkeConfiguration(options =>
             {
                 options.SwaggerOptions = _swaggerOptions;
@@ -130,9 +121,10 @@ namespace Lykke.Service.CexIoAdapter
                         settings.OrderBooks.CurrencyMapping,
                         logFactory));
                     x.UseHandleBusinessExceptionsMiddleware();
-                    x.UseMiddleware<CollectMetricsMiddleware>();
                 };
             });
+
+            app.UseMetricServer();
         }
 
         [UsedImplicitly]
