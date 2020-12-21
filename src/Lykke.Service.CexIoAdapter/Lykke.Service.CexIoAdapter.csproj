@@ -26,14 +26,11 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Lykke.Common.ExchangeAdapter.Server" Version="5.1.0" />
-    <PackageReference Include="Nexogen.Libraries.Metrics.Prometheus.AspCore" Version="3.0.1" />
   </ItemGroup>
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Lykke.Service.CexIoAdapter.AzureRepositories\Lykke.Service.CexIoAdapter.AzureRepositories.csproj" />
-    <ProjectReference Include="..\Lykke.Service.CexIoAdapter.Core\Lykke.Service.CexIoAdapter.Core.csproj" />
     <ProjectReference Include="..\Lykke.Service.CexIoAdapter.Services\Lykke.Service.CexIoAdapter.Services.csproj" />
   </ItemGroup>
   <Target Name="PrepublishScript" BeforeTargets="PrepareForPublish">
