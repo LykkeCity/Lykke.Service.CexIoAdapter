@@ -56,6 +56,14 @@ namespace Lykke.Service.CexIoAdapter.Services
                     InternalMetrics.QuoteOutSidePrice
                         .WithLabels(tickPrice.Asset, "bid")
                         .Set((double) tickPrice.Bid);
+
+                    InternalMetrics.OrderBookOutCount
+                        .WithLabels(tickPrice.Asset)
+                        .Inc();
+
+                    InternalMetrics.OrderBookOutDelayMilliseconds
+                        .WithLabels(tickPrice.Asset)
+                        .Set((DateTime.UtcNow - tickPrice.Timestamp).TotalMilliseconds);
                 }
             });
         }
